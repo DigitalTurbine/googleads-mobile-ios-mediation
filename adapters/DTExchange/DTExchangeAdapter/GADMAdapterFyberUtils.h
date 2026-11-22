@@ -53,7 +53,8 @@ void GADMAdapterFyberInitializeWithAppId(
 void GADMAdapterFyberSetCOPPA(void);
 
 /// Returns the DT Exchange native privacy icon position for the AdChoices position set in
-/// GADNativeAdViewAdOptions, or bottom-left (the DT Exchange default) when the options don't
-/// include GADNativeAdViewAdOptions.
+/// GADNativeAdViewAdOptions. The Google Mobile Ads SDK passes GADNativeAdViewAdOptions even when the
+/// publisher sets none, so an unset position is its default, top-right. Bottom-left (the DT Exchange
+/// default) is only a fallback for options without GADNativeAdViewAdOptions.
 IANativeAdPrivacyIconPosition GADMAdapterFyberPrivacyIconPositionFromOptions(
     NSArray<GADAdLoaderOptions *> *_Nonnull options);

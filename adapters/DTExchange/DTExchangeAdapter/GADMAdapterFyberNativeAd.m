@@ -105,7 +105,7 @@
 
   IASDKCore.sharedInstance.mediationType = [[IAMediationAdMob alloc] init];
 
-  // The corner the publisher set for AdChoices in GADNativeAdViewAdOptions, bottom-left otherwise.
+  // The corner the publisher set for AdChoices in GADNativeAdViewAdOptions; top-right when unset.
   IANativeAdPrivacyIconPosition privacyIconPosition =
       GADMAdapterFyberPrivacyIconPositionFromOptions(_adConfiguration.options);
 
