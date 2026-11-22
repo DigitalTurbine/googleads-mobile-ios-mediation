@@ -126,3 +126,24 @@ void GADMAdapterFyberSetCOPPA(void) {
     IASDKCore.sharedInstance.coppaApplies = IACoppaAppliesTypeUnknown;
   }
 }
+
+IANativeAdPrivacyIconPosition GADMAdapterFyberPrivacyIconPositionFromOptions(
+    NSArray<GADAdLoaderOptions *> *_Nonnull options) {
+  for (GADAdLoaderOptions *loaderOptions in options) {
+    if (![loaderOptions isKindOfClass:[GADNativeAdViewAdOptions class]]) {
+      continue;
+    }
+    switch (((GADNativeAdViewAdOptions *)loaderOptions).preferredAdChoicesPosition) {
+      case GADAdChoicesPositionTopLeftCorner:
+        return IANativeAdPrivacyIconPositionTopLeft;
+      case GADAdChoicesPositionTopRightCorner:
+        return IANativeAdPrivacyIconPositionTopRight;
+      case GADAdChoicesPositionBottomRightCorner:
+        return IANativeAdPrivacyIconPositionBottomRight;
+      case GADAdChoicesPositionBottomLeftCorner:
+      default:
+        return IANativeAdPrivacyIconPositionBottomLeft;
+    }
+  }
+  return IANativeAdPrivacyIconPositionBottomLeft;
+}

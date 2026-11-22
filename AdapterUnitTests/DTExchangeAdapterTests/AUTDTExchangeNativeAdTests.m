@@ -24,6 +24,7 @@
 #import "GADMAdapterFyberConstants.h"
 #import "GADMAdapterFyberExtras.h"
 #import "GADMAdapterFyberNativeAd.h"
+#import "GADMAdapterFyberUtils.h"
 
 static NSString *const kDTExchangeAppID = @"12345";
 static NSString *const kDTExchangeSpotID = @"67890";
@@ -172,7 +173,78 @@ static NSString *const kDTExchangeWatermark = @"test_watermark";
   return eventDelegate;
 }
 
+/// Loads a native ad whose configuration carries |options|, as a publisher's GADAdLoader would.
+- (void)loadNativeAdWithOptions:(nonnull NSArray<GADAdLoaderOptions *> *)options {
+  NSData *watermarkData = [kDTExchangeWatermark dataUsingEncoding:NSUTF8StringEncoding];
+
+  OCMStub([_IASDKCoreMock initWithAppID:kDTExchangeAppID
+                        completionBlock:OCMOCK_ANY
+                        completionQueue:OCMOCK_ANY])
+      .andDo(^(NSInvocation *invocation) {
+        __unsafe_unretained void (^completionHandler)(BOOL success, NSError *_Nullable error);
+        [invocation getArgument:&completionHandler atIndex:3];
+        completionHandler(YES, nil);
+      });
+  OCMStub([_IANativeAdSpotMock loadAdWithMarkup:kDTExchangeBidResponse
+                              withWatermarkData:watermarkData
+                                 withCompletion:OCMOCK_ANY])
+      .andDo(^(NSInvocation *invocation) {
+        __unsafe_unretained void (^completionHandler)(IANativeAdAssets *_Nullable nativeAdAssets,
+                                                      NSError *_Nullable error);
+        [invocation getArgument:&completionHandler atIndex:4];
+        completionHandler(self->_nativeAdAssetsMock, nil);
+      });
+
+  AUTKMediationNativeAdConfiguration *configuration =
+      [self createAdConfigurationWithAppId:kDTExchangeAppID
+                                    spotId:kDTExchangeSpotID
+                               bidResponse:kDTExchangeBidResponse
+                                 watermark:watermarkData];
+  configuration.options = options;
+
+  AUTKWaitAndAssertLoadNativeAd(_adapter, configuration);
+}
+
 #pragma mark - Tests
+
+- (void)testLoadNativeAdPassesTheAdChoicesPositionAsThePrivacyIconPosition {
+  GADNativeAdViewAdOptions *options = [[GADNativeAdViewAdOptions alloc] init];
+  options.preferredAdChoicesPosition = GADAdChoicesPositionTopLeftCorner;
+
+  [self loadNativeAdWithOptions:@[ options ]];
+
+  OCMVerify([_IANativeAdSpotBuilderMock setPrivacyIconPosition:IANativeAdPrivacyIconPositionTopLeft]);
+}
+
+- (void)testLoadNativeAdKeepsBottomLeftWithoutNativeAdViewAdOptions {
+  [self loadNativeAdWithOptions:@[]];
+
+  OCMVerify(
+      [_IANativeAdSpotBuilderMock setPrivacyIconPosition:IANativeAdPrivacyIconPositionBottomLeft]);
+}
+
+- (void)testPrivacyIconPositionFromOptionsMapsEveryAdChoicesPosition {
+  NSDictionary<NSNumber *, NSNumber *> *expected = @{
+    @(GADAdChoicesPositionTopRightCorner) : @(IANativeAdPrivacyIconPositionTopRight),
+    @(GADAdChoicesPositionTopLeftCorner) : @(IANativeAdPrivacyIconPositionTopLeft),
+    @(GADAdChoicesPositionBottomRightCorner) : @(IANativeAdPrivacyIconPositionBottomRight),
+    @(GADAdChoicesPositionBottomLeftCorner) : @(IANativeAdPrivacyIconPositionBottomLeft),
+  };
+  for (NSNumber *adChoicesPosition in expected) {
+    GADNativeAdViewAdOptions *options = [[GADNativeAdViewAdOptions alloc] init];
+    options.preferredAdChoicesPosition = adChoicesPosition.integerValue;
+
+    XCTAssertEqual(GADMAdapterFyberPrivacyIconPositionFromOptions(@[ options ]),
+                   expected[adChoicesPosition].integerValue);
+  }
+}
+
+- (void)testPrivacyIconPositionFromOptionsIsBottomLeftWithoutNativeAdViewAdOptions {
+  XCTAssertEqual(GADMAdapterFyberPrivacyIconPositionFromOptions(@[]),
+                 IANativeAdPrivacyIconPositionBottomLeft);
+  XCTAssertEqual(GADMAdapterFyberPrivacyIconPositionFromOptions(@[ [[GADVideoOptions alloc] init] ]),
+                 IANativeAdPrivacyIconPositionBottomLeft);
+}
 
 - (void)testLoadNativeAdSuccess {
   AUTKMediationNativeAdEventDelegate *eventDelegate =

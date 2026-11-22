@@ -1,5 +1,8 @@
 ## DT Exchange iOS Mediation Adapter Changelog
 
+#### Next Version
+- Adapter now forwards the AdChoices position set in `GADNativeAdViewAdOptions` to the position of the DT Exchange native ad privacy icon. Without `GADNativeAdViewAdOptions`, the privacy icon stays in the bottom-left corner.
+
 #### [Version 8.5.2.0](https://dl.google.com/googleadmobadssdk/mediation/ios/dtexchange/DTExchangeAdapter-8.5.2.0.zip)
 - Verified compatibility with DT Exchange SDK version 8.5.2.
 

@@ -105,9 +105,14 @@
 
   IASDKCore.sharedInstance.mediationType = [[IAMediationAdMob alloc] init];
 
+  // The corner the publisher set for AdChoices in GADNativeAdViewAdOptions, bottom-left otherwise.
+  IANativeAdPrivacyIconPosition privacyIconPosition =
+      GADMAdapterFyberPrivacyIconPositionFromOptions(_adConfiguration.options);
+
   _nativeAdSpot = [IANativeAdSpot build:^(id<IANativeAdSpotBuilder> _Nonnull builder) {
     builder.adRequest = request;
     builder.delegate = self;
+    builder.privacyIconPosition = privacyIconPosition;
     if (spotID.length) {
       // example of `userInfo` usage in order to map among spot and callback
       // in case there are multimple spots:
