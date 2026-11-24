@@ -3,6 +3,7 @@
 #### Next Version
 - Adapter now forwards the AdChoices position set in `GADNativeAdViewAdOptions` to the position of the DT Exchange native ad privacy icon. When the publisher doesn't set a position, the privacy icon follows the Google Mobile Ads SDK default, the top-right corner.
 - Adapter now implements `didUntrackView:`: when a native ad view stops showing the DT Exchange ad, the ad no longer handles clicks, its privacy icon or its impression in that view.
+- Now requires DT Exchange SDK version 8.5.3 or higher.
 
 #### [Version 8.5.2.0](https://dl.google.com/googleadmobadssdk/mediation/ios/dtexchange/DTExchangeAdapter-8.5.2.0.zip)
 - Verified compatibility with DT Exchange SDK version 8.5.2.
