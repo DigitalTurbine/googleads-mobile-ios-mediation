@@ -105,9 +105,14 @@
 
   IASDKCore.sharedInstance.mediationType = [[IAMediationAdMob alloc] init];
 
+  // The corner the publisher set for AdChoices in GADNativeAdViewAdOptions; top-right when unset.
+  IANativeAdPrivacyIconPosition privacyIconPosition =
+      GADMAdapterFyberPrivacyIconPositionFromOptions(_adConfiguration.options);
+
   _nativeAdSpot = [IANativeAdSpot build:^(id<IANativeAdSpotBuilder> _Nonnull builder) {
     builder.adRequest = request;
     builder.delegate = self;
+    builder.privacyIconPosition = privacyIconPosition;
     if (spotID.length) {
       // example of `userInfo` usage in order to map among spot and callback
       // in case there are multimple spots:
@@ -270,6 +275,12 @@
                                     mediaView:mediaView
                                      iconView:iconView
                                clickableViews:otherClickableViews];
+}
+
+- (void)didUntrackView:(nullable UIView *)view {
+  // The ad is no longer rendered in the view (for example, a reused native ad view now shows another
+  // ad): stop handling its clicks, privacy icon and impression there.
+  [_nativeAdAssets unregisterViews];
 }
 
 #pragma mark - IANativeAdDelegate

@@ -51,3 +51,10 @@ void GADMAdapterFyberInitializeWithAppId(
 
 /// Sets DTExchange COPPA setting by using the Google Mobile Ads settings.
 void GADMAdapterFyberSetCOPPA(void);
+
+/// Returns the DT Exchange native privacy icon position for the AdChoices position set in
+/// GADNativeAdViewAdOptions. The Google Mobile Ads SDK passes GADNativeAdViewAdOptions even when the
+/// publisher sets none, so an unset position is its default, top-right. Bottom-left (the DT Exchange
+/// default) is only a fallback for options without GADNativeAdViewAdOptions.
+IANativeAdPrivacyIconPosition GADMAdapterFyberPrivacyIconPositionFromOptions(
+    NSArray<GADAdLoaderOptions *> *_Nonnull options);
