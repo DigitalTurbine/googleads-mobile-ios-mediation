@@ -277,6 +277,12 @@
                                clickableViews:otherClickableViews];
 }
 
+- (void)didUntrackView:(nullable UIView *)view {
+  // The ad is no longer rendered in the view (for example, a reused native ad view now shows another
+  // ad): stop handling its clicks, privacy icon and impression there.
+  [_nativeAdAssets unregisterViews];
+}
+
 #pragma mark - IANativeAdDelegate
 
 - (UIViewController *)iaParentViewControllerForAdSpot:(IANativeAdSpot *)adSpot {
